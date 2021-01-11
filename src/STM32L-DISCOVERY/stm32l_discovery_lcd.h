@@ -113,7 +113,7 @@ MSB   { 1 , 1 , 0 , 0   }
 
 void LCD_bar(void);
 void LCD_GLASS_Init(void);
-void LCD_GLASS_WriteChar(uint8_t* ch, bool point, bool column,uint8_t position);
+void LCD_GLASS_WriteChar(uint8_t ch, bool point, bool column,uint8_t position);
 void LCD_GLASS_DisplayString(uint8_t* ptr);
 void LCD_GLASS_DisplayStrDeci(uint16_t* ptr);
 void LCD_GLASS_ClearChar(uint8_t position);

@@ -81,7 +81,7 @@ const uint16_t NumberMap[10]=
         0x5F00,0x4200,0xF500,0x6700,0xEa00,0xAF00,0xBF00,0x04600,0xFF00,0xEF00
     };
 
-static void LCD_Conv_Char_Seg(uint8_t* c,bool point,bool column,uint8_t* digit);
+static void LCD_Conv_Char_Seg(uint8_t c,bool point,bool column,uint8_t* digit);
 
 /**
   * @brief  Configures the LCD GLASS relative GPIO port IOs and LCD peripheral.
@@ -258,12 +258,12 @@ void LCD_bar()
 	* @param 	digit array with segment 
   * @retval None
   */
-static void LCD_Conv_Char_Seg(uint8_t* c,bool point,bool column, uint8_t* digit)
+static void LCD_Conv_Char_Seg(uint8_t c,bool point,bool column, uint8_t* digit)
 {
   uint16_t ch = 0 ;
   uint8_t i,j;
   
-  switch (*c)
+  switch (c)
     {
     case ' ' : 
       ch = 0x00;
@@ -313,19 +313,19 @@ static void LCD_Conv_Char_Seg(uint8_t* c,bool point,bool column, uint8_t* digit)
     case '7':
     case '8':
     case '9':			
-      ch = NumberMap[*c-0x30];		
+      ch = NumberMap[c-0x30];
       break;
           
     default:
       /* The character c is one letter in upper case*/
-      if ( (*c < 0x5b) && (*c > 0x40) )
+      if ( (c < 0x5b) && (c > 0x40) )
       {
-        ch = CapLetterMap[*c-'A'];
+        ch = CapLetterMap[c-'A'];
       }
       /* The character c is one letter in lower case*/
-      if ( (*c <0x7b) && ( *c> 0x60) )
+      if ( (c <0x7b) && (c> 0x60) )
       {
-        ch = CapLetterMap[*c-'a'];
+        ch = CapLetterMap[c-'a'];
       }
       break;
   }
@@ -361,7 +361,7 @@ static void LCD_Conv_Char_Seg(uint8_t* c,bool point,bool column, uint8_t* digit)
   * @par    Required preconditions: The LCD should be cleared before to start the
   *         write operation.  
   */
-void LCD_GLASS_WriteChar(uint8_t* ch, bool point, bool column, uint8_t position)
+void LCD_GLASS_WriteChar(uint8_t ch, bool point, bool column, uint8_t position)
 {
   uint8_t digit[4];     /* Digit frame buffer */
    
@@ -482,7 +482,7 @@ void LCD_GLASS_DisplayString(uint8_t* ptr)
   while ((*ptr != 0) & (i < 8))
   {
     /* Display one character on LCD */
-    LCD_GLASS_WriteChar(ptr, FALSE, FALSE, i);
+    LCD_GLASS_WriteChar(*ptr, FALSE, FALSE, i);
 
     /* Point on the next character */
     ptr++;
@@ -513,14 +513,14 @@ void LCD_GLASS_DisplayStrDeci(uint16_t* ptr)
     {
       case DOT:
           /* Display one character on LCD with decimal point */
-          LCD_GLASS_WriteChar(&char_tmp, POINT_ON, COLUMN_OFF, i);
+          LCD_GLASS_WriteChar(char_tmp, POINT_ON, COLUMN_OFF, i);
           break;
       case DOUBLE_DOT:
           /* Display one character on LCD with decimal point */
-          LCD_GLASS_WriteChar(&char_tmp, POINT_OFF, COLUMN_ON, i);
+          LCD_GLASS_WriteChar(char_tmp, POINT_OFF, COLUMN_ON, i);
           break;
       default:
-          LCD_GLASS_WriteChar(&char_tmp, POINT_OFF, COLUMN_OFF, i);		
+          LCD_GLASS_WriteChar(char_tmp, POINT_OFF, COLUMN_OFF, i);
           break;
     }/* Point on the next character */
     ptr++;

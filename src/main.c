@@ -24,7 +24,8 @@
 #include "stdio.h"
 #include "discover_board.h"
 #include "stm32l_discovery_lcd.h"
-
+#include "ds18b20.h"
+#include <stdbool.h>
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -156,14 +157,6 @@ int main(void)
   /* Init I/O ports */
   Init_GPIOs();
   
-  for(uint8_t i = 0; i < 5; i++)
-  {
-	  GPIO_HIGH(LD_GPIO_PORT, LD_BLUE_GPIO_PIN);
-	  Delay(500);
-	  GPIO_LOW(LD_GPIO_PORT, LD_BLUE_GPIO_PIN);
-	  Delay(500);
-  }
-
   /* Initializes the LCD glass */
   LCD_GLASS_Configure_GPIO();
   LCD_GLASS_Init();
@@ -194,15 +187,15 @@ int main(void)
 
   /* Configure ADC for temperature sensor value conversion */ 
   configureADC_Temp();
-   
 
-  while(1){
+  while(1)
+  {
 
     /* Re-enable DMA and ADC conf and start Temperature Data acquisition */ 
-    acquireTemperatureData();
+    //acquireTemperatureData();
 	
     /* Stay in SLEEP mode untill the data are acquired by ADC */
-    __WFI();  
+    //__WFI();
     
     /* for DEBUG purpose uncomment the following line and comment the __WFI call to do not enter STOP mode */
     // while (!flag_ADCDMA_TransferComplete);
@@ -210,8 +203,15 @@ int main(void)
     /* Disable ADC, DMA and clock*/
     powerDownADC_Temper();
     
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+    ds18b20_init();
+    while(!ds18b20_work())
+    {
+    }
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, DISABLE);
     /* Process mesured Temperature data - calculate average temperature value in °C */
-    processTempData();
+    //processTempData();
+	temperature_C = ds18b20_getTemp(0) * 10;
 
     if (flag_UserButton == TRUE){
        clearUserButtonFlag();
@@ -223,14 +223,22 @@ int main(void)
     
     if (CurrentlyDisplayed == Display_TemperatureDegC) {
       /* print average temperature value in °C  */
-      sprintf(strDisp, "%d °C", temperature_C );
+      //sprintf(strDisp, "%d.%d °C", temperature_C/10, temperature_C % 10 );
+        LCD_GLASS_Clear();
+        uint8_t n = 1;
+        LCD_GLASS_WriteChar((temperature_C < 0) ? '-' : ' ', false, false, n++);
+        temperature_C = abs(temperature_C);
+        LCD_GLASS_WriteChar((temperature_C > 100) ? '0' + (temperature_C/100)%10 : ' ', false, false, n++);
+        LCD_GLASS_WriteChar('0' + (temperature_C/10) % 10, true, false, n++);
+        LCD_GLASS_WriteChar('0' + temperature_C%10, false, false, n++);
+        LCD_GLASS_WriteChar('°', false, false, n++);
     } else {
       /* print result of ADC conversion  */
       sprintf(strDisp, "> %d", tempAVG );
+      LCD_GLASS_Clear();
+      LCD_GLASS_DisplayString( (unsigned char *) strDisp );
     }
 
-    LCD_GLASS_Clear();
-    LCD_GLASS_DisplayString( (unsigned char *) strDisp );
     
     /* Enable RTC Wakeup */ 
     RTC_WakeUpCmd(ENABLE);
