@@ -1,0 +1,3 @@
+[submodule "ds18b20"]
+	path = ds18b20
+	url = https://github.com/jensnielsen/ds18b20.git
