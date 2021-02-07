@@ -144,17 +144,6 @@ void SysTick_Handler(void)
 /*  file (startup_stm32l1xx_md.s).                                            */
 /******************************************************************************/
 
-/**
-  * @brief  This function handles DMA Transfer Complete interrupt request.
-  * @param  None
-  * @retval None
-  */
-void DMA1_Channel1_IRQHandler    (void)
-{
-  DMA_ClearFlag(DMA1_IT_TC1);
-  setADCDMA_TransferComplete();  /* set flag_ADCDMA_TransferComplete global flag */
-}
-
 
 /**
   * @brief  This function handles RTC Auto wake-up interrupt request.

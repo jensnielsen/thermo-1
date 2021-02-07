@@ -36,7 +36,6 @@
 
 void TimingDelay_Decrement(void);
 void Delay(__IO uint32_t nTime);
-void setADCDMA_TransferComplete(void);
 void setUserButtonFlag(void);
 
 #endif /* __MAIN_H */
